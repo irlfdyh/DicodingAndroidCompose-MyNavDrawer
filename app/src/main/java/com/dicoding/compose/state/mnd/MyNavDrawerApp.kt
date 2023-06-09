@@ -18,6 +18,9 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
@@ -28,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,6 +46,8 @@ fun MyNavDrawerApp() {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     val items = listOf(
         MenuItem(
@@ -61,6 +67,7 @@ fun MyNavDrawerApp() {
     val selectedItem = remember { mutableStateOf(items[0]) }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             MyTopBar(
                 onMenuClick = {
@@ -88,6 +95,15 @@ fun MyNavDrawerApp() {
                             label = { Text(item.title) },
                             selected = item == selectedItem.value,
                             onClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                    snackbarHostState.showSnackbar(
+                                        message = context.resources.getString(R.string.coming_soon, item.title),
+                                        actionLabel = context.resources.getString(R.string.subscribe_question),
+                                        withDismissAction = true,
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
                                 selectedItem.value = item
                             },
                             modifier = Modifier.padding(horizontal = 12.dp)
