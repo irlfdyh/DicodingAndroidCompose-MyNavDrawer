@@ -66,7 +66,13 @@ fun MyNavDrawerApp() {
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = stringResource(id = R.string.hello_world))
+                    Text(
+                        if (drawerState.isClosed) {
+                            stringResource(R.string.swipe_to_open)
+                        } else {
+                            stringResource(R.string.swipe_to_close)
+                        }
+                    )
                 }
             }
         )
